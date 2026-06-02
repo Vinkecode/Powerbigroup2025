@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power BI — Learning Path Corporativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --navy: #0B1426;
+  --navy-mid: #142040;
+  --navy-light: #1E2F55;
+  --blue: #2563EB;
+  --blue-bright: #3B82F6;
+  --cyan: #06B6D4;
+  --gold: #F59E0B;
+  --gold-light: #FCD34D;
+  --white: #F8FAFF;
+  --white-dim: rgba(248,250,255,0.7);
+  --white-faint: rgba(248,250,255,0.12);
+  --white-ghost: rgba(248,250,255,0.05);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--navy);
+  color: var(--white);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── Lock Screen ───────────────────────────────────────────── */
+#lock-screen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--navy);
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  gap: 0;
+}
+.lock-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%, rgba(37,99,235,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 75% 60%, rgba(6,182,212,0.12) 0%, transparent 70%);
+}
+.lock-box {
+  position: relative; z-index: 1;
+  text-align: center;
+  animation: fadeUp 0.6s var(--ease) both;
+}
+.lock-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 0 40px rgba(37,99,235,0.4);
+}
+.lock-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.35rem;
+}
+.lock-sub {
+  font-size: 0.9rem;
+  color: var(--white-dim);
+  margin-bottom: 2rem;
+}
+.lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 300px;
+}
+.lock-input {
+  background: var(--white-ghost);
+  border: 1px solid rgba(248,250,255,0.15);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: center;
+  letter-spacing: 0.25em;
+}
+.lock-input::placeholder { letter-spacing: 0.05em; color: rgba(248,250,255,0.35); }
+.lock-input:focus { border-color: var(--blue-bright); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+.lock-btn {
+  background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+  border: none; border-radius: 10px;
+  padding: 0.85rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 600;
+  color: #fff; cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  letter-spacing: 0.03em;
+}
+.lock-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.lock-btn:active { transform: translateY(0); }
+.lock-error {
+  font-size: 0.8rem; color: #F87171;
+  min-height: 1.2em;
+  animation: shake 0.35s var(--ease);
+}
+.lock-hint {
+  font-size: 0.75rem;
+  color: rgba(248,250,255,0.25);
+  margin-top: 1rem;
+}
+
+/* ─── Main Content (hidden until unlocked) ─────────────────── */
+#main { display: none; }
+
+/* ─── Nav ───────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(12px);
+  background: rgba(11,20,38,0.85);
+  border-bottom: 1px solid rgba(248,250,255,0.06);
+  transition: all 0.3s;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.05rem; font-weight: 700;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.nav-logo-mark {
+  width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+.nav-links {
+  display: flex; gap: 2rem;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  font-size: 0.85rem;
+  color: var(--white-dim);
+  transition: color 0.2s;
+  font-weight: 400;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-badge {
+  background: rgba(37,99,235,0.2);
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 20px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  font-weight: 500;
+}
+
+/* ─── Hero ──────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center;
+  padding: 8rem 2rem 5rem;
+  position: relative; overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 50%, rgba(37,99,235,0.15) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 70% at 80% 30%, rgba(6,182,212,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 60% 80%, rgba(245,158,11,0.06) 0%, transparent 60%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(248,250,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248,250,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+.hero-inner {
+  max-width: 1100px; margin: 0 auto;
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: 1fr 420px;
+  gap: 4rem; align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(37,99,235,0.12);
+  border: 1px solid rgba(59,130,246,0.25);
+  border-radius: 20px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--cyan);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.5s 0.1s var(--ease) both;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.5s 0.2s var(--ease) both;
+}
+.hero-title span { color: var(--blue-bright); }
+.hero-title .accent { color: var(--gold); }
+.hero-desc {
+  font-size: 1.05rem;
+  color: var(--white-dim);
+  font-weight: 300;
+  max-width: 480px;
+  margin-bottom: 2rem;
+  line-height: 1.7;
+  animation: fadeUp 0.5s 0.3s var(--ease) both;
+}
+.hero-stats {
+  display: flex; gap: 2rem;
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.5s 0.4s var(--ease) both;
+}
+.hero-stat { }
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 2rem; font-weight: 800;
+  color: var(--white);
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 0.78rem;
+  color: var(--white-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.hero-cta {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  animation: fadeUp 0.5s 0.5s var(--ease) both;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--blue), var(--blue-bright));
+  border: none; border-radius: 10px;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem; font-weight: 600;
+  color: #fff; cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,0.45); }
+.btn-secondary {
+  background: var(--white-ghost);
+  border: 1px solid rgba(248,250,255,0.15);
+  border-radius: 10px;
+  padding: 0.85rem 1.75rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem; font-weight: 500;
+  color: var(--white-dim); cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { background: var(--white-faint); color: var(--white); border-color: rgba(248,250,255,0.3); }
+
+/* Hero card panel */
+.hero-card {
+  background: var(--navy-mid);
+  border: 1px solid rgba(248,250,255,0.08);
+  border-radius: 20px;
+  padding: 1.75rem;
+  animation: fadeUp 0.6s 0.3s var(--ease) both;
+  position: relative; overflow: hidden;
+}
+.hero-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan), transparent);
+}
+.card-header {
+  font-family: var(--font-display);
+  font-size: 0.85rem; font-weight: 600;
+  color: var(--white-dim);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 1.25rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.card-header::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+.module-pill {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(248,250,255,0.05);
+}
+.module-pill:last-child { border-bottom: none; }
+.pill-num {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+}
+.pill-name { font-size: 0.85rem; color: var(--white); flex: 1; }
+.pill-badge {
+  font-size: 0.65rem; font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.level-b { background: rgba(16,185,129,0.15); color: #34D399; }
+.level-i { background: rgba(59,130,246,0.15); color: #93C5FD; }
+.level-a { background: rgba(245,158,11,0.15); color: #FCD34D; }
+.level-p { background: rgba(167,139,250,0.15); color: #C4B5FD; }
+
+/* ─── Section Base ──────────────────────────────────────────── */
+section { padding: 5rem 2rem; }
+.container { max-width: 1100px; margin: 0 auto; }
+.section-eyebrow {
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--cyan);
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+.section-sub {
+  font-size: 1rem;
+  color: var(--white-dim);
+  font-weight: 300;
+  max-width: 560px;
+  line-height: 1.7;
+}
+
+/* ─── What You'll Learn ─────────────────────────────────────── */
+#aprende { background: var(--navy-mid); }
+.learn-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1px;
+  background: rgba(248,250,255,0.06);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 3rem;
+}
+.learn-item {
+  background: var(--navy-mid);
+  padding: 1.75rem;
+  transition: background 0.2s;
+}
+.learn-item:hover { background: var(--navy-light); }
+.learn-icon {
+  font-size: 1.5rem; margin-bottom: 1rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px;
+  border-radius: 12px;
+  background: var(--white-ghost);
+}
+.learn-item h3 {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.learn-item p { font-size: 0.85rem; color: var(--white-dim); line-height: 1.6; }
+
+/* ─── Curriculum ────────────────────────────────────────────── */
+#curriculum { }
+.curriculum-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 3rem;
+}
+.mod-card {
+  background: var(--navy-mid);
+  border: 1px solid rgba(248,250,255,0.06);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.mod-card::after {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  border-radius: 0 2px 2px 0;
+  opacity: 0; transition: opacity 0.2s;
+}
+.mod-card:hover { background: var(--navy-light); border-color: rgba(248,250,255,0.12); transform: translateY(-2px); }
+.mod-card:hover::after { opacity: 1; }
+.mod-card.color-b::after { background: #34D399; }
+.mod-card.color-i::after { background: var(--blue-bright); }
+.mod-card.color-a::after { background: var(--gold); }
+.mod-card.color-p::after { background: #A78BFA; }
+.mod-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
+.mod-num {
+  font-family: var(--font-display);
+  font-size: 0.7rem; font-weight: 800;
+  color: var(--white-dim);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.mod-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 0.4rem;
+}
+.mod-topics { font-size: 0.78rem; color: var(--white-dim); line-height: 1.5; }
+.mod-footer { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.85rem; }
+.mod-week {
+  font-size: 0.7rem;
+  color: rgba(248,250,255,0.35);
+  display: flex; align-items: center; gap: 0.3rem;
+}
+.mod-week::before { content: '📅'; font-size: 0.65rem; }
+
+/* ─── Roadmap timeline ──────────────────────────────────────── */
+#roadmap { background: var(--navy-mid); }
+.timeline {
+  position: relative;
+  margin-top: 3rem;
+  padding-left: 2.5rem;
+}
+.timeline::before {
+  content: '';
+  position: absolute; left: 0.65rem; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(to bottom, var(--blue), var(--cyan), var(--gold), rgba(248,250,255,0.1));
+}
+.tl-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+.tl-dot {
+  position: absolute; left: -2.05rem; top: 0.25rem;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--navy-mid);
+  display: flex; align-items: center; justify-content: center;
+}
+.tl-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.tl-phase {
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+  opacity: 0.65;
+}
+.tl-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem; font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.tl-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.chip {
+  font-size: 0.72rem;
+  background: var(--white-ghost);
+  border: 1px solid rgba(248,250,255,0.1);
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  color: var(--white-dim);
+}
+
+/* ─── Dataset section ───────────────────────────────────────── */
+#datasets { }
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.ds-card {
+  background: var(--navy-mid);
+  border: 1px solid rgba(248,250,255,0.07);
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: all 0.2s;
+}
+.ds-card:hover { border-color: rgba(248,250,255,0.15); transform: translateY(-2px); }
+.ds-emoji { font-size: 1.75rem; margin-bottom: 0.85rem; }
+.ds-name {
+  font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.ds-desc { font-size: 0.8rem; color: var(--white-dim); line-height: 1.6; margin-bottom: 0.85rem; }
+.ds-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.ds-tag {
+  font-size: 0.65rem;
+  background: var(--white-ghost);
+  border: 1px solid rgba(248,250,255,0.08);
+  border-radius: 20px;
+  padding: 0.2rem 0.55rem;
+  color: rgba(248,250,255,0.5);
+}
+
+/* ─── Instructor / Info section ─────────────────────────────── */
+#info { background: var(--navy-mid); }
+.info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+  margin-top: 2.5rem;
+}
+.info-card {
+  background: var(--navy);
+  border: 1px solid rgba(248,250,255,0.07);
+  border-radius: 16px;
+  padding: 1.75rem;
+}
+.info-card h3 {
+  font-family: var(--font-display);
+  font-size: 1rem; font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--white);
+}
+.req-list { list-style: none; }
+.req-list li {
+  font-size: 0.85rem; color: var(--white-dim);
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(248,250,255,0.05);
+  display: flex; align-items: center; gap: 0.65rem;
+}
+.req-list li:last-child { border-bottom: none; }
+.req-list li::before { content: '→'; color: var(--cyan); font-size: 0.75rem; }
+.objective-list { list-style: none; }
+.objective-list li {
+  font-size: 0.85rem; color: var(--white-dim);
+  padding: 0.45rem 0;
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  border-bottom: 1px solid rgba(248,250,255,0.05);
+}
+.objective-list li:last-child { border-bottom: none; }
+.obj-check { color: #34D399; flex-shrink: 0; margin-top: 0.1rem; }
+
+/* ─── CTA Banner ────────────────────────────────────────────── */
+#cta {
+  text-align: center;
+  padding: 5rem 2rem;
+  position: relative; overflow: hidden;
+}
+.cta-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 50% 50%, rgba(37,99,235,0.18) 0%, transparent 70%);
+}
+.cta-inner { position: relative; z-index: 1; }
+.cta-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+.cta-sub { font-size: 1rem; color: var(--white-dim); margin-bottom: 2rem; }
+
+/* ─── Footer ────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid rgba(248,250,255,0.06);
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(248,250,255,0.25);
+}
+footer span { color: var(--blue-bright); }
+
+/* ─── Animations ────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0) rotate(0deg); opacity:1; }
+  100% { transform: translateY(220px) rotate(720deg); opacity:0; }
+}
+@keyframes goalPop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-card { display: none; }
+  .curriculum-grid { grid-template-columns: 1fr; }
+  .info-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+@media (max-width: 600px) {
+  .hero-stats { gap: 1.2rem; }
+  .hero-stat-num { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- LOCK SCREEN                                                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="lock-screen">
+  <div class="lock-bg"></div>
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title">Acceso privado</div>
+    <div class="lock-sub">Ingresa la contraseña para ver el programa</div>
+    <div class="lock-form">
+      <input type="password" id="pwd-input" class="lock-input" placeholder="Contraseña" maxlength="30" autocomplete="off">
+      <button class="lock-btn" onclick="checkPassword()">Ingresar →</button>
+      <div class="lock-error" id="lock-error"></div>
+    </div>
+    <div class="lock-hint">Curso interno — solo para participantes registrados</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- MAIN CONTENT                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div id="main">
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-mark">📊</div>
+    Power BI Learning Path
+  </div>
+  <ul class="nav-links">
+    <li><a href="#aprende">Qué aprenderás</a></li>
+    <li><a href="#curriculum">Currículo</a></li>
+    <li><a href="#roadmap">Ruta avanzada</a></li>
+    <li><a href="#datasets">Datasets</a></li>
+  </ul>
+  <div class="nav-badge">🔓 Acceso interno</div>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">📅 13 semanas · 1 hora/semana</div>
+      <h1 class="hero-title">
+        Domina <span>Power BI</span><br>
+        de cero a<br>
+        <span class="accent">nivel profesional</span>
+      </h1>
+      <p class="hero-desc">
+        Un programa estructurado para usuarios de negocio, analistas junior y personal administrativo. Desde Excel hasta dashboards ejecutivos que impulsan decisiones reales.
+      </p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">11</div>
+          <div class="hero-stat-label">Módulos</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">13h</div>
+          <div class="hero-stat-label">Contenido</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">3</div>
+          <div class="hero-stat-label">Niveles</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">100%</div>
+          <div class="hero-stat-label">Práctico</div>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <a href="#curriculum" class="btn-primary">Ver currículo completo →</a>
+        <a href="#datasets" class="btn-secondary">📦 Datasets de práctica</a>
+      </div>
+    </div>
+
+    <!-- Mini curriculum card -->
+    <div class="hero-card">
+      <div class="card-header">Programa de 11 módulos</div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(52,211,153,0.15);color:#34D399">01</div>
+        <span class="pill-name">Introducción a Business Intelligence</span>
+        <span class="pill-badge level-b">Básico</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(52,211,153,0.15);color:#34D399">02</div>
+        <span class="pill-name">Conexión y obtención de datos</span>
+        <span class="pill-badge level-b">Básico</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(52,211,153,0.15);color:#34D399">03</div>
+        <span class="pill-name">Transformación con Power Query</span>
+        <span class="pill-badge level-b">Básico</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(59,130,246,0.15);color:#93C5FD">04</div>
+        <span class="pill-name">Modelado de datos</span>
+        <span class="pill-badge level-i">Intermedio</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(59,130,246,0.15);color:#93C5FD">05</div>
+        <span class="pill-name">Introducción a DAX</span>
+        <span class="pill-badge level-i">Intermedio</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(59,130,246,0.15);color:#93C5FD">06</div>
+        <span class="pill-name">DAX Intermedio & Time Intelligence</span>
+        <span class="pill-badge level-i">Intermedio</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(59,130,246,0.15);color:#93C5FD">07</div>
+        <span class="pill-name">Visualizaciones efectivas</span>
+        <span class="pill-badge level-i">Intermedio</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(59,130,246,0.15);color:#93C5FD">08</div>
+        <span class="pill-name">Storytelling with Data</span>
+        <span class="pill-badge level-i">Intermedio</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(245,158,11,0.15);color:#FCD34D">09</div>
+        <span class="pill-name">Dashboards Ejecutivos</span>
+        <span class="pill-badge level-a">Avanzado</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(245,158,11,0.15);color:#FCD34D">10</div>
+        <span class="pill-name">Publicación y gobierno</span>
+        <span class="pill-badge level-a">Avanzado</span>
+      </div>
+      <div class="module-pill">
+        <div class="pill-num" style="background:rgba(167,139,250,0.15);color:#C4B5FD">11</div>
+        <span class="pill-name">Proyecto Final</span>
+        <span class="pill-badge level-p">Proyecto</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── QUÉ APRENDERÁS ─────────────────────────────────────────── -->
+<section id="aprende">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Resultados</div>
+      <h2 class="section-title">Qué serás capaz de hacer</h2>
+      <p class="section-sub">Al finalizar el programa podrás construir soluciones de datos completas, de forma autónoma, que impacten decisiones reales en tu organización.</p>
+    </div>
+    <div class="learn-grid">
+      <div class="learn-item reveal">
+        <div class="learn-icon">🔌</div>
+        <h3>Conectar y transformar datos</h3>
+        <p>Excel, CSV, SharePoint, SQL Server y APIs web. Limpiar y preparar datos con Power Query sin necesidad de código.</p>
+      </div>
+      <div class="learn-item reveal">
+        <div class="learn-icon">🗂️</div>
+        <h3>Construir modelos dimensionales</h3>
+        <p>Diseñar Star Schemas con tablas de hechos y dimensiones. Relaciones, cardinalidad y contexto de filtro.</p>
+      </div>
+      <div class="learn-item reveal">
+        <div class="learn-icon">⚡</div>
+        <h3>Escribir medidas en DAX</h3>
+        <p>Desde SUM hasta Time Intelligence. YTD, YoY, Rankings, KPIs dinámicos y medidas con CALCULATE.</p>
+      </div>
+      <div class="learn-item reveal">
+        <div class="learn-icon">📊</div>
+        <h3>Diseñar visualizaciones efectivas</h3>
+        <p>Seleccionar el visual correcto para cada pregunta. Evitar los errores más comunes. Drillthrough y tooltips.</p>
+      </div>
+      <div class="learn-item reveal">
+        <div class="learn-icon">📖</div>
+        <h3>Contar historias con datos</h3>
+        <p>Aplicar los principios de Cole Nussbaumer Knaflic. Reducir ruido visual, guiar la atención y comunicar decisiones.</p>
+      </div>
+      <div class="learn-item reveal">
+        <div class="learn-icon">🏢</div>
+        <h3>Publicar con seguridad</h3>
+        <p>Power BI Service, Workspaces, Apps y Row Level Security. Gobierno básico y actualizaciones automáticas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CURRÍCULO ─────────────────────────────────────────────── -->
+<section id="curriculum">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Contenido</div>
+      <h2 class="section-title">Currículo completo</h2>
+      <p class="section-sub">13 semanas, 1 hora por semana. Progresión diseñada para usuarios con conocimientos básicos de Excel.</p>
+    </div>
+    <div class="curriculum-grid">
+
+      <div class="mod-card color-b reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 01 · Semana 1</div>
+          <span class="pill-badge level-b">Básico</span>
+        </div>
+        <div class="mod-title">Introducción a Business Intelligence</div>
+        <div class="mod-topics">¿Qué es BI? · Ecosistema Power BI · Desktop vs Service vs Mobile · Dataflows · Semantic Models · Flujo completo de datos</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 1</span></div>
+      </div>
+
+      <div class="mod-card color-b reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 02 · Semanas 2–3</div>
+          <span class="pill-badge level-b">Básico</span>
+        </div>
+        <div class="mod-title">Conexión y obtención de datos</div>
+        <div class="mod-topics">ETL · Excel · CSV · SharePoint Files & Lists · SQL Server · Analysis Services · Web Sources · Import Mode vs DirectQuery</div>
+        <div class="mod-footer"><span class="mod-week">Sesiones 2–3</span></div>
+      </div>
+
+      <div class="mod-card color-b reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 03 · Semanas 4–5</div>
+          <span class="pill-badge level-b">Básico</span>
+        </div>
+        <div class="mod-title">Transformación de datos con Power Query</div>
+        <div class="mod-topics">Editor de Power Query · Limpieza de datos · Tipos de dato · Columnas personalizadas · Merge Queries · Append Queries · Lenguaje M</div>
+        <div class="mod-footer"><span class="mod-week">Sesiones 4–5</span></div>
+      </div>
+
+      <div class="mod-card color-i reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 04 · Semana 6</div>
+          <span class="pill-badge level-i">Intermedio</span>
+        </div>
+        <div class="mod-title">Modelado de datos</div>
+        <div class="mod-topics">Star Schema · Fact & Dimension Tables · Relaciones · Cardinalidad · Dirección de filtro · Filter Context · Tabla de fechas</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 6</span></div>
+      </div>
+
+      <div class="mod-card color-i reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 05 · Semana 7</div>
+          <span class="pill-badge level-i">Intermedio</span>
+        </div>
+        <div class="mod-title">Introducción a DAX</div>
+        <div class="mod-topics">Columnas calculadas vs medidas · SUM · AVERAGE · COUNT · DISTINCTCOUNT · DIVIDE · VAR / RETURN · CALCULATE básico</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 7</span></div>
+      </div>
+
+      <div class="mod-card color-i reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 06 · Semana 8</div>
+          <span class="pill-badge level-i">Intermedio</span>
+        </div>
+        <div class="mod-title">DAX Intermedio</div>
+        <div class="mod-topics">Filter Context · Row Context · Time Intelligence · YTD · YoY · SAMEPERIODLASTYEAR · Running Totals · RANKX · KPI Measures</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 8</span></div>
+      </div>
+
+      <div class="mod-card color-i reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 07 · Semana 9</div>
+          <span class="pill-badge level-i">Intermedio</span>
+        </div>
+        <div class="mod-title">Visualizaciones efectivas</div>
+        <div class="mod-topics">Selección de visual correcta · Barras · Líneas · Mapas · Matrices · Drillthrough · Tooltips · Errores comunes de visualización</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 9</span></div>
+      </div>
+
+      <div class="mod-card color-i reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 08 · Semana 10</div>
+          <span class="pill-badge level-i">Intermedio</span>
+        </div>
+        <div class="mod-title">Storytelling with Data</div>
+        <div class="mod-topics">Principios de Knaflic · Identificar el mensaje · Eliminar ruido visual · Color estratégico · Jerarquía visual · Antes y después</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 10</span></div>
+      </div>
+
+      <div class="mod-card color-a reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 09 · Semana 11</div>
+          <span class="pill-badge level-a">Avanzado</span>
+        </div>
+        <div class="mod-title">Dashboards Ejecutivos</div>
+        <div class="mod-topics">Diseño para liderazgo · KPI Dashboards · Dashboard financiero · Dashboard de ventas · Fundraising · UX para analytics</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 11</span></div>
+      </div>
+
+      <div class="mod-card color-a reveal">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 10 · Semana 12</div>
+          <span class="pill-badge level-a">Avanzado</span>
+        </div>
+        <div class="mod-title">Publicación y gobierno de datos</div>
+        <div class="mod-topics">Power BI Service · Workspaces · Apps · Compartir reportes · Row Level Security · Refresh automático · Gobierno básico</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 12</span></div>
+      </div>
+
+      <div class="mod-card color-p reveal" style="grid-column: span 2;">
+        <div class="mod-card-top">
+          <div class="mod-num">Módulo 11 · Semana 13</div>
+          <span class="pill-badge level-p">Proyecto Final 🎓</span>
+        </div>
+        <div class="mod-title">Proyecto Final: Dashboard ejecutivo de punta a punta</div>
+        <div class="mod-topics">Fuente de datos real (Excel/SharePoint) · Transformación completa en Power Query · Modelo dimensional · Mínimo 5 medidas DAX con Time Intelligence · Dashboard ejecutivo 3 páginas · Storytelling aplicado · Presentación al grupo de 10 minutos</div>
+        <div class="mod-footer"><span class="mod-week">Sesión 13 — Presentaciones finales</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── REQUISITOS E INFO ──────────────────────────────────────── -->
+<section id="info">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Para quién es</div>
+      <h2 class="section-title">Requisitos y audiencia</h2>
+    </div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <h3>✅ Objetivos al finalizar</h3>
+        <ul class="objective-list">
+          <li><span class="obj-check">✓</span> Crear reportes y dashboards profesionales de forma autónoma</li>
+          <li><span class="obj-check">✓</span> Conectar, limpiar y transformar datos de múltiples fuentes</li>
+          <li><span class="obj-check">✓</span> Diseñar modelos dimensionales correctos</li>
+          <li><span class="obj-check">✓</span> Escribir medidas DAX incluyendo Time Intelligence</li>
+          <li><span class="obj-check">✓</span> Aplicar principios de Storytelling con datos</li>
+          <li><span class="obj-check">✓</span> Publicar y gestionar reportes en Power BI Service</li>
+          <li><span class="obj-check">✓</span> Presentar hallazgos a audiencia ejecutiva</li>
+        </ul>
+      </div>
+      <div class="info-card reveal">
+        <h3>📋 Requisitos previos</h3>
+        <ul class="req-list">
+          <li>Conocimientos básicos de Excel (tablas, fórmulas simples)</li>
+          <li>Computadora con Windows 10/11</li>
+          <li>Power BI Desktop instalado (gratuito)</li>
+          <li>Cuenta Microsoft 365 (para Power BI Service)</li>
+          <li>Disposición para practicar entre sesiones</li>
+          <li>No se requieren conocimientos de programación</li>
+        </ul>
+        <br>
+        <h3>👥 Audiencia</h3>
+        <ul class="req-list">
+          <li>Usuarios de negocio y analistas junior</li>
+          <li>Personal administrativo y financiero</li>
+          <li>Coordinadores de área y project managers</li>
+          <li>Profesionales de ONG y fundraising</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DATASETS ──────────────────────────────────────────────── -->
+<section id="datasets">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">Materiales</div>
+      <h2 class="section-title">Datasets de práctica</h2>
+      <p class="section-sub">Conjuntos de datos recomendados para practicar durante el programa, desde la primera hasta la última sesión.</p>
+    </div>
+    <div class="ds-grid">
+      <div class="ds-card reveal">
+        <div class="ds-emoji">🏪</div>
+        <div class="ds-name">Contoso Sales Dataset</div>
+        <div class="ds-desc">Dataset oficial de Microsoft con ventas, clientes, productos y territorios. Ideal para modelado, DAX y dashboards ejecutivos.</div>
+        <div class="ds-tags">
+          <span class="ds-tag">Oficial Microsoft</span>
+          <span class="ds-tag">Ventas</span>
+          <span class="ds-tag">~1M filas</span>
+          <span class="ds-tag">Módulos 4–9</span>
+        </div>
+      </div>
+      <div class="ds-card reveal">
+        <div class="ds-emoji">🚲</div>
+        <div class="ds-name">AdventureWorks</div>
+        <div class="ds-desc">Fabricante de bicicletas de Microsoft. Excelente para modelado relacional y Time Intelligence. Disponible en Excel y SQL.</div>
+        <div class="ds-tags">
+          <span class="ds-tag">Oficial Microsoft</span>
+          <span class="ds-tag">Fabricación</span>
+          <span class="ds-tag">Excel + SQL</span>
+          <span class="ds-tag">Módulos 4–8</span>
+        </div>
+      </div>
+      <div class="ds-card reveal">
+        <div class="ds-emoji">💰</div>
+        <div class="ds-name">Financial Sample</div>
+        <div class="ds-desc">Incluido directamente en Power BI Desktop. Ideal para las primeras sesiones sin descargas adicionales.</div>
+        <div class="ds-tags">
+          <span class="ds-tag">Integrado en PBI</span>
+          <span class="ds-tag">Financiero</span>
+          <span class="ds-tag">Módulos 1–3</span>
+        </div>
+      </div>
+      <div class="ds-card reveal">
+        <div class="ds-emoji">❤️</div>
+        <div class="ds-name">Dataset Fundraising / ONG</div>
+        <div class="ds-desc">Dataset personalizado con donantes, campañas y programas. Construido con datos ficticios o anonimizados de la organización.</div>
+        <div class="ds-tags">
+          <span class="ds-tag">Personalizado</span>
+          <span class="ds-tag">ONG</span>
+          <span class="ds-tag">Excel</span>
+          <span class="ds-tag">Todos los módulos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ROADMAP AVANZADO ──────────────────────────────────────── -->
+<section id="roadmap">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">¿Y después?</div>
+      <h2 class="section-title">Ruta hacia nivel experto</h2>
+      <p class="section-sub">Una vez finalizado este programa, esta es la ruta sugerida para alcanzar nivel avanzado en Power BI, Fabric y AI aplicada a analytics.</p>
+    </div>
+    <div class="timeline">
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background:rgba(59,130,246,0.2);color:#3B82F6"></div>
+        <div class="tl-phase" style="color:#93C5FD">Meses 1–2 después del programa</div>
+        <div class="tl-title">DAX Avanzado</div>
+        <div class="tl-chips">
+          <span class="chip">CALCULATE avanzado</span>
+          <span class="chip">Iteradores SUMX/AVERAGEX</span>
+          <span class="chip">ALLSELECTED / ALLEXCEPT</span>
+          <span class="chip">Tablas virtuales</span>
+          <span class="chip">SELECTEDVALUE</span>
+          <span class="chip">DAX Studio</span>
+          <span class="chip">Tabular Editor</span>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background:rgba(6,182,212,0.2);color:#06B6D4"></div>
+        <div class="tl-phase" style="color:#67E8F9">Meses 2–3</div>
+        <div class="tl-title">Modelado avanzado</div>
+        <div class="tl-chips">
+          <span class="chip">Composite models</span>
+          <span class="chip">Aggregations</span>
+          <span class="chip">Calculation groups</span>
+          <span class="chip">Field parameters</span>
+          <span class="chip">BISM Normalizer</span>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background:rgba(52,211,153,0.2);color:#34D399"></div>
+        <div class="tl-phase" style="color:#6EE7B7">Meses 3–5</div>
+        <div class="tl-title">Microsoft Fabric</div>
+        <div class="tl-chips">
+          <span class="chip">OneLake</span>
+          <span class="chip">Lakehouse</span>
+          <span class="chip">Dataflows Gen2</span>
+          <span class="chip">Data Pipelines</span>
+          <span class="chip">Real-time analytics</span>
+          <span class="chip">Eventhouse</span>
+          <span class="chip">Spark Notebooks</span>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background:rgba(245,158,11,0.2);color:#F59E0B"></div>
+        <div class="tl-phase" style="color:#FCD34D">Meses 5–7</div>
+        <div class="tl-title">AI aplicada a Analytics</div>
+        <div class="tl-chips">
+          <span class="chip">Copilot en Power BI</span>
+          <span class="chip">Smart Narratives</span>
+          <span class="chip">Anomaly Detection</span>
+          <span class="chip">Key Influencers</span>
+          <span class="chip">Q&A visual</span>
+          <span class="chip">Azure ML integración</span>
+        </div>
+      </div>
+
+      <div class="tl-item reveal">
+        <div class="tl-dot" style="background:rgba(167,139,250,0.2);color:#A78BFA"></div>
+        <div class="tl-phase" style="color:#C4B5FD">Meses 6–8</div>
+        <div class="tl-title">Certificación PL-300 — Power BI Data Analyst Associate</div>
+        <div class="tl-chips">
+          <span class="chip">Exam PL-300</span>
+          <span class="chip">Microsoft Certified</span>
+          <span class="chip">Validación oficial</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── QUIZ GAME ─────────────────────────────────────────────── -->
+<section id="quiz-game" style="padding:5rem 2rem;background:var(--navy-mid);">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-eyebrow">⚽ Mini Juego</div>
+      <h2 class="section-title">¿Con quién quieres jugar?</h2>
+      <p class="section-sub">Cada pregunta correcta hace que tu jugador patee y anote. ¡5 correctas = 1 GOL en el marcador!</p>
+    </div>
+
+    <div id="game-wrap" style="margin-top:2.5rem;">
+
+      <!-- PLAYER SELECT -->
+      <div id="player-select" style="display:flex;gap:1.25rem;justify-content:center;margin-bottom:1.75rem;flex-wrap:wrap;">
+        <div class="player-card" id="pick-messi" onclick="selectPlayer('messi')" style="cursor:pointer;background:var(--navy);border:2px solid rgba(248,250,255,0.08);border-radius:16px;padding:1.25rem 1.75rem;text-align:center;transition:all 0.2s;min-width:160px;">
+          <canvas id="messi-preview" width="20" height="26" style="display:block;margin:0 auto 0.6rem;image-rendering:pixelated;width:60px;height:78px;"></canvas>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:#fff;">Messi</div>
+          <div style="font-size:0.72rem;color:rgba(248,250,255,0.45);margin-top:2px;">🇦🇷 La Pulga</div>
+          <div style="font-size:0.68rem;color:#93C5FD;margin-top:6px;padding:3px 8px;background:rgba(59,130,246,0.12);border-radius:20px;display:inline-block;">Celebración: La Estatua</div>
+        </div>
+        <div class="player-card" id="pick-cr7" onclick="selectPlayer('cr7')" style="cursor:pointer;background:var(--navy);border:2px solid rgba(248,250,255,0.08);border-radius:16px;padding:1.25rem 1.75rem;text-align:center;transition:all 0.2s;min-width:160px;">
+          <canvas id="cr7-preview" width="20" height="26" style="display:block;margin:0 auto 0.6rem;image-rendering:pixelated;width:60px;height:78px;"></canvas>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:#fff;">Cristiano</div>
+          <div style="font-size:0.72rem;color:rgba(248,250,255,0.45);margin-top:2px;">🇵🇹 CR7</div>
+          <div style="font-size:0.68rem;color:#FCD34D;margin-top:6px;padding:3px 8px;background:rgba(245,158,11,0.12);border-radius:20px;display:inline-block;">Celebración: SIUUU</div>
+        </div>
+      </div>
+
+      <!-- SCOREBOARD -->
+      <div id="scoreboard" style="display:flex;align-items:center;justify-content:space-between;background:var(--navy);border:1px solid rgba(248,250,255,0.08);border-radius:16px;padding:1rem 1.5rem;margin-bottom:1.25rem;">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div id="active-player-badge" style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(248,250,255,0.07);color:rgba(248,250,255,0.5);">Elige un jugador</div>
+          <div id="goal-display" style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1.25rem;">
+          <div style="text-align:center;">
+            <div id="score-num" style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:#34D399;line-height:1;">0</div>
+            <div style="font-size:0.6rem;color:rgba(248,250,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Correctas</div>
+          </div>
+          <div style="text-align:center;">
+            <div id="streak-num" style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:#FCD34D;line-height:1;">0</div>
+            <div style="font-size:0.6rem;color:rgba(248,250,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Racha</div>
+          </div>
+          <div style="text-align:center;">
+            <div id="q-counter" style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:#93C5FD;line-height:1;">1/5</div>
+            <div style="font-size:0.6rem;color:rgba(248,250,255,0.4);text-transform:uppercase;letter-spacing:0.05em;">Pregunta</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIELD -->
+      <div id="field-container" style="position:relative;background:#0d1f0e;border:1px solid rgba(248,250,255,0.08);border-radius:16px;overflow:hidden;margin-bottom:1.25rem;height:220px;">
+
+        <!-- Grass stripes -->
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(22,163,74,0.18) 0px,rgba(22,163,74,0.18) 50px,rgba(22,163,74,0.28) 50px,rgba(22,163,74,0.28) 100px);"></div>
+
+        <!-- SVG field markings -->
+        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 760 220" preserveAspectRatio="none">
+          <line x1="380" y1="0" x2="380" y2="220" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="8,6"/>
+          <ellipse cx="380" cy="110" rx="52" ry="44" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+          <rect x="0" y="70" width="55" height="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+          <rect x="705" y="70" width="55" height="80" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+          <!-- left goal posts -->
+          <rect x="0" y="82" width="18" height="56" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <!-- right goal posts -->
+          <rect x="742" y="82" width="18" height="56" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+          <!-- goal nets left -->
+          <line x1="2" y1="93" x2="18" y2="93" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="2" y1="110" x2="18" y2="110" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="2" y1="127" x2="18" y2="127" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="7" y1="82" x2="7" y2="138" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <line x1="13" y1="82" x2="13" y2="138" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <!-- goal nets right -->
+          <line x1="742" y1="93" x2="758" y2="93" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="742" y1="110" x2="758" y2="110" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="742" y1="127" x2="758" y2="127" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+          <line x1="747" y1="82" x2="747" y2="138" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <line x1="753" y1="82" x2="753" y2="138" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        </svg>
+
+        <!-- BALL -->
+        <canvas id="ball-canvas" width="12" height="12" style="position:absolute;image-rendering:pixelated;width:28px;height:28px;z-index:12;transition:left 0.05s,top 0.05s;"></canvas>
+
+        <!-- MESSI canvas -->
+        <canvas id="messi-canvas" width="20" height="26" style="position:absolute;image-rendering:pixelated;width:52px;height:68px;z-index:10;"></canvas>
+
+        <!-- CR7 canvas -->
+        <canvas id="cr7-canvas" width="20" height="26" style="position:absolute;image-rendering:pixelated;width:52px;height:68px;z-index:10;"></canvas>
+
+        <!-- Crowd particle container -->
+        <div id="confetti-wrap" style="position:absolute;inset:0;pointer-events:none;z-index:25;overflow:hidden;"></div>
+
+        <!-- GOAL FLASH -->
+        <div id="goal-flash" style="position:absolute;inset:0;opacity:0;transition:opacity 0.12s;pointer-events:none;z-index:22;border-radius:16px;"></div>
+
+        <!-- GOAL TEXT -->
+        <div id="goal-text" style="position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:#FCD34D;text-shadow:0 2px 20px rgba(252,211,77,0.8);opacity:0;pointer-events:none;z-index:30;white-space:nowrap;transition:opacity 0.2s,transform 0.2s;"></div>
+
+        <!-- Player name labels -->
+        <div id="messi-label" style="position:absolute;font-family:var(--font-display);font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.4);padding:1px 5px;border-radius:4px;z-index:15;display:none;">MESSI</div>
+        <div id="cr7-label" style="position:absolute;font-family:var(--font-display);font-size:0.6rem;font-weight:700;color:rgba(255,255,255,0.7);background:rgba(0,0,0,0.4);padding:1px 5px;border-radius:4px;z-index:15;display:none;">CR7</div>
+      </div>
+
+      <!-- QUIZ CARD -->
+      <div id="quiz-card" style="background:var(--navy);border:1px solid rgba(248,250,255,0.08);border-radius:16px;padding:1.75rem;transition:all 0.3s;">
+        <div style="display:flex;gap:6px;margin-bottom:1.25rem;">
+          <div id="prog-1" style="flex:1;height:3px;border-radius:2px;background:rgba(248,250,255,0.1);transition:background 0.3s;"></div>
+          <div id="prog-2" style="flex:1;height:3px;border-radius:2px;background:rgba(248,250,255,0.1);transition:background 0.3s;"></div>
+          <div id="prog-3" style="flex:1;height:3px;border-radius:2px;background:rgba(248,250,255,0.1);transition:background 0.3s;"></div>
+          <div id="prog-4" style="flex:1;height:3px;border-radius:2px;background:rgba(248,250,255,0.1);transition:background 0.3s;"></div>
+          <div id="prog-5" style="flex:1;height:3px;border-radius:2px;background:rgba(248,250,255,0.1);transition:background 0.3s;"></div>
+        </div>
+        <div id="q-category" style="font-size:0.7rem;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem;"></div>
+        <div id="q-text" style="font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--white);line-height:1.45;margin-bottom:1.4rem;"></div>
+        <div id="q-options" style="display:grid;grid-template-columns:1fr 1fr;gap:0.65rem;"></div>
+        <div id="q-feedback" style="margin-top:1rem;min-height:2.2rem;font-size:0.85rem;font-weight:500;text-align:center;"></div>
+        <div id="next-btn-wrap" style="text-align:center;margin-top:0.5rem;display:none;">
+          <button onclick="nextQuestion()" style="background:linear-gradient(135deg,#2563EB,#3B82F6);border:none;border-radius:10px;padding:0.7rem 2rem;font-family:var(--font-display);font-size:0.9rem;font-weight:600;color:#fff;cursor:pointer;transition:all 0.2s;">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- ROUND RESULT -->
+      <div id="round-result" style="display:none;text-align:center;background:var(--navy);border:1px solid rgba(248,250,255,0.08);border-radius:16px;padding:2.5rem 2rem;">
+        <div id="result-player-canvas-wrap" style="margin-bottom:1rem;"></div>
+        <div id="result-emoji" style="font-size:3rem;margin-bottom:0.75rem;"></div>
+        <div id="result-title" style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:0.5rem;"></div>
+        <div id="result-sub" style="font-size:0.9rem;color:rgba(248,250,255,0.6);margin-bottom:1.5rem;"></div>
+        <div id="total-goals-display" style="font-family:var(--font-display);font-size:1rem;color:#FCD34D;margin-bottom:1.5rem;"></div>
+        <button onclick="startRound()" style="background:linear-gradient(135deg,#2563EB,#3B82F6);border:none;border-radius:10px;padding:0.85rem 2rem;font-family:var(--font-display);font-size:0.9rem;font-weight:600;color:#fff;cursor:pointer;margin-right:0.75rem;">Jugar de nuevo ↻</button>
+        <button onclick="resetAll()" style="background:rgba(248,250,255,0.05);border:1px solid rgba(248,250,255,0.15);border-radius:10px;padding:0.85rem 2rem;font-family:var(--font-display);font-size:0.9rem;font-weight:500;color:rgba(248,250,255,0.6);cursor:pointer;">Resetear todo</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ───────────────────────────────────────────────────── -->
+<section id="cta">
+  <div class="cta-bg"></div>
+  <div class="cta-inner">
+    <div class="reveal">
+      <h2 class="cta-title">¿Listo para empezar?</h2>
+      <p class="cta-sub">13 semanas. 1 hora por semana. Transforma tu forma de trabajar con datos.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="#curriculum" class="btn-primary">Ver el programa completo →</a>
+        <a href="#info" class="btn-secondary">Revisar requisitos</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>Programa interno de capacitación · Power BI Learning Path Corporativo · <span>Acceso privado</span></p>
+</footer>
+
+</div><!-- end #main -->
+
+<script>
+/* ─── Password ─────────────────────────────────────────────────── */
+// 🔑 CAMBIA ESTA CONTRASEÑA:
+const PASS = "powerbi2025";
+
+function checkPassword() {
+  const val = document.getElementById('pwd-input').value;
+  const err = document.getElementById('lock-error');
+  if (val === PASS) {
+    const lock = document.getElementById('lock-screen');
+    lock.style.transition = 'opacity 0.5s ease';
+    lock.style.opacity = '0';
+    setTimeout(() => {
+      lock.style.display = 'none';
+      document.getElementById('main').style.display = 'block';
+      initReveal();
+      setTimeout(()=>{
+        updateGoalDisplay();
+        drawPlayerOn('messi-preview','messi','idle');
+        drawPlayerOn('cr7-preview','cr7','idle');
+        drawBall(); resetPositions();
+      }, 300);
+    }, 500);
+  } else {
+    err.textContent = 'Contraseña incorrecta. Intenta de nuevo.';
+    err.style.animation = 'none';
+    requestAnimationFrame(() => { err.style.animation = 'shake 0.35s ease'; });
+    document.getElementById('pwd-input').value = '';
+    document.getElementById('pwd-input').focus();
+  }
+}
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   DUAL PLAYER QUIZ GAME — MESSI vs CR7
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Sprite palettes ────────────────────────────────────────── */
+// Each sprite is 20 wide x 26 tall pixels
+// Colors: 0=transparent
+
+const MESSI_PAL = {
+  '0':null, 'S':'#F4C08A', 'H':'#3D2B1A', // skin, hair dark
+  'A':'#75AADB', 'B':'#3A7BBD', 'C':'#1E4D8C', // Argentina light/mid/dark blue
+  'W':'#FFFFFF', 'K':'#111111', 'G':'#888888',  // white, black, gray
+  'N':'#F0E68C',  // number gold
+};
+const CR7_PAL = {
+  '0':null, 'S':'#D4956A', 'H':'#1A1008', // skin darker, very dark hair
+  'A':'#CC0000', 'B':'#AA0000', 'C':'#880000', // Portugal red
+  'W':'#FFFFFF', 'K':'#111111', 'G':'#888888',
+  'N':'#FFD700',
+};
+
+// 20x26 sprites — each string = 1 row of 20 chars
+const SP = {
+  messi_idle:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "00000HSSSSSH0000000",
+    "000000SSSSSS0000000",
+    "000000SCCCSC0000000",
+    "00000ACCCCCCCA00000",
+    "00000ACCCCCCCA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKWWWKW0000000",
+    "00000WKWWWKW0000000",
+    "00000KK0000KK000000",
+    "00000KK0000KK000000",
+    "0000000000000000000",
+  ],
+  messi_run1:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SCCCSC0000000",
+    "00000ACCCCCCCA00000",
+    "00000ACCCCCCCA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKW000000000000",
+    "00000WK0000000000000",
+    "00000KK0000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  messi_run2:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SCCCSC0000000",
+    "00000ACCCCCCCA00000",
+    "00000ACCCCCCCA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "0000000000WKW000000",
+    "00000000000WK000000",
+    "000000000000KK00000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  messi_kick:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "0000AACCCCCCCA00000",
+    "0000ACCCCCCCC000000",
+    "00000ACCCCCCA000000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKW00000000000",
+    "00000WK00KKKKKK0000",
+    "00000KK0000000K0000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  messi_celebrate:[ // arms out wide, La Pulga pose — arms up
+    "000000HHHHHHHH00000",
+    "000000HSSSSSSH00000",
+    "000000SSSSSS000000",
+    "A000000SCCCSC0000A",
+    "AA0000ACCCCCCCA0AA",
+    "0A000AACCCCCCAA0A0",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKWWWKW0000000",
+    "00000WKWWWKW0000000",
+    "0000KKW000WKK000000",
+    "0000KK000000KK00000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  messi_sad:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SCCCSC0000000",
+    "00000ACCCCCCCA00000",
+    "00000ACCCCCCCA00000",
+    "0000SASSSSSSAS00000",
+    "0000SASSSSSSAS00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKWWWKW0000000",
+    "00000WKWWWKW0000000",
+    "00000KK0000KK000000",
+    "00000KK0000KK000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  cr7_idle:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "00000HSSSSSH0000000",
+    "000000SSSSSS0000000",
+    "000000SBBBSB0000000",
+    "00000ABBBBBBBA00000",
+    "00000ABBBBBBBA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKWWWKW0000000",
+    "00000WKWWWKW0000000",
+    "00000KK0000KK000000",
+    "00000KK0000KK000000",
+    "0000000000000000000",
+  ],
+  cr7_run1:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SBBBSB0000000",
+    "00000ABBBBBBBA00000",
+    "00000ABBBBBBBA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKW000000000000",
+    "00000WK0000000000000",
+    "00000KK0000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  cr7_run2:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SBBBSB0000000",
+    "00000ABBBBBBBA00000",
+    "00000ABBBBBBBA00000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "0000000000WKW000000",
+    "00000000000WK000000",
+    "000000000000KK00000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  cr7_kick:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "0000AABBBBBBBA00000",
+    "0000ABBBBBBBB000000",
+    "00000ABBBBBBA000000",
+    "00000ASSSSSSSA00000",
+    "00000ASSSSSSSA00000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKW00000000000",
+    "00000WK00KKKKKK0000",
+    "00000KK0000000K0000",
+    "0000000000000000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  cr7_celebrate:[ // SIUUU — arms up, lean back
+    "000000HHHHHHHH00000",
+    "0A00000HSSSSH000A00",
+    "0AA0000SSSSS00000AA",
+    "0A00000SBBBS0000000",
+    "000000ABBBBBBA00000",
+    "000000ABBBBBBA00000",
+    "000000ASSSSSSA00000",
+    "000000ASSSSSSA00000",
+    "000000WWWWWWW000000",
+    "000000WWWWWWW000000",
+    "0000000KW000WK00000",
+    "00000000K00000K0000",
+    "000000000K000K00000",
+    "00000000KK000KK0000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+  cr7_sad:[
+    "00000HHHHHHHH000000",
+    "00000HSSSSSSH000000",
+    "000000SSSSSS0000000",
+    "000000SBBBSB0000000",
+    "00000ABBBBBBBA00000",
+    "00000ABBBBBBBA00000",
+    "0000BASSSSSSASB0000",
+    "0000BASSSSSSASB0000",
+    "000000WWWWWW0000000",
+    "000000WWWWWW0000000",
+    "00000WKWWWKW0000000",
+    "00000WKWWWKW0000000",
+    "00000KK0000KK000000",
+    "00000KK0000KK000000",
+    "0000000000000000000",
+    "0000000000000000000",
+  ],
+};
+
+// Ball sprite 12x12
+const BALL_SP = [
+  "00WWWWWWWW00",
+  "0WWKKKWWWWW0",
+  "WWKKWWWKWWWW",
+  "WKWWWWWWKWWW",
+  "WKWWWWWWWKWW",
+  "WWKWWWWWWKWW",
+  "WWWKWWWWKWWW",
+  "WWWWKWWKWWWW",
+  "WWWWWKKKWWWW",
+  "0WWWWWWWWWW0",
+  "00WWWWWWWW00",
+  "000000000000",
+];
+const BALL_PAL = {'0':null,'W':'#EEEEEE','K':'#222222'};
+
+function drawSpriteOn(ctx, rows, pal, w, h) {
+  ctx.clearRect(0,0,w,h);
+  rows.forEach((row,y)=>{
+    if(y>=h) return;
+    for(let x=0;x<row.length&&x<w;x++){
+      const c=pal[row[x]];
+      if(c){ctx.fillStyle=c;ctx.fillRect(x,y,1,1);}
+    }
+  });
+}
+
+function drawBall() {
+  const c = document.getElementById('ball-canvas');
+  if(!c) return;
+  drawSpriteOn(c.getContext('2d'), BALL_SP, BALL_PAL, 12, 12);
+}
+
+function drawPlayerOn(id, who, state) {
+  const c = document.getElementById(id);
+  if(!c) return;
+  const rows = SP[who+'_'+state] || SP[who+'_idle'];
+  const pal = who==='messi' ? MESSI_PAL : CR7_PAL;
+  drawSpriteOn(c.getContext('2d'), rows, pal, 20, 26);
+}
+
+/* ─── Game state ─────────────────────────────────────────────── */
+let goals = 0;
+let roundScore = 0;
+let currentQ = 0;
+let roundQuestions = [];
+let answered = false;
+let activePlayer = null; // 'messi' | 'cr7'
+let animTimer = null;
+let animFrame = 0;
+
+// Field pixel positions (percent-based, set at runtime)
+let fieldW = 760, fieldH = 220;
+
+function getFieldEl() { return document.getElementById('field-container'); }
+
+function pxPos(xPct, yPct) {
+  const el = getFieldEl();
+  if(!el) return {x:0,y:0};
+  const r = el.getBoundingClientRect();
+  return { x: r.width * xPct, y: r.height * yPct };
+}
+
+function placeEl(id, xPct, yPct) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const f = getFieldEl();
+  const fw = f ? f.offsetWidth : 760;
+  const fh = f ? f.offsetHeight : 220;
+  el.style.left = (fw * xPct - 26) + 'px';
+  el.style.top  = (fh * yPct - 34) + 'px';
+}
+function placeBall(xPct, yPct) {
+  const el = document.getElementById('ball-canvas');
+  if(!el) return;
+  const f = getFieldEl();
+  const fw = f ? f.offsetWidth : 760;
+  const fh = f ? f.offsetHeight : 220;
+  el.style.transition = 'none';
+  el.style.left = (fw * xPct - 14) + 'px';
+  el.style.top  = (fh * yPct - 14) + 'px';
+}
+
+function moveBall(xPct, yPct, dur, cb) {
+  const el = document.getElementById('ball-canvas');
+  if(!el) return;
+  const f = getFieldEl();
+  const fw = f ? f.offsetWidth : 760;
+  const fh = f ? f.offsetHeight : 220;
+  const tx = fw * xPct - 14;
+  const ty = fh * yPct - 14;
+  // Animate with JS frames for arc + rotation
+  const startX = parseFloat(el.style.left)||fw*0.5;
+  const startY = parseFloat(el.style.top)||fh*0.5;
+  const steps = Math.round(dur / 16);
+  let step = 0;
+  let angle = 0;
+  const ctx = el.getContext('2d');
+  const timer = setInterval(()=>{
+    step++;
+    const t = step/steps;
+    const ease = t<0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const cx = startX + (tx-startX)*ease;
+    const arc = Math.sin(t*Math.PI)*-28;
+    const cy = startY + (ty-startY)*ease + arc;
+    el.style.left = cx+'px';
+    el.style.top  = cy+'px';
+    // rotate ball canvas
+    angle += 18;
+    ctx.save();
+    ctx.translate(6,6);
+    ctx.rotate(angle*Math.PI/180);
+    ctx.translate(-6,-6);
+    drawSpriteOn(ctx, BALL_SP, BALL_PAL, 12, 12);
+    ctx.restore();
+    if(step>=steps){
+      clearInterval(timer);
+      if(cb) cb();
+    }
+  },16);
+}
+
+function movePlayer(id, xPct, yPct, dur, cb) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  const f = getFieldEl();
+  const fw = f ? f.offsetWidth : 760;
+  const fh = f ? f.offsetHeight : 220;
+  const tx = fw*xPct - 26;
+  const ty = fh*yPct - 34;
+  const sx = parseFloat(el.style.left)||fw*0.5;
+  const sy = parseFloat(el.style.top)||fh*0.5;
+  const steps = Math.round(dur/16);
+  let step = 0;
+  const timer = setInterval(()=>{
+    step++;
+    const t = step/steps;
+    const ease = t<0.5?2*t*t:-1+(4-2*t)*t;
+    el.style.left = (sx+(tx-sx)*ease)+'px';
+    el.style.top  = (sy+(ty-sy)*ease)+'px';
+    if(step>=steps){ clearInterval(timer); if(cb)cb(); }
+  },16);
+}
+
+/* ─── Player select ──────────────────────────────────────────── */
+function selectPlayer(who) {
+  activePlayer = who;
+  // Style cards
+  ['messi','cr7'].forEach(p => {
+    const card = document.getElementById('pick-'+p);
+    if(p===who){
+      card.style.borderColor = (p==='messi') ? '#3B82F6' : '#EF4444';
+      card.style.background = (p==='messi') ? 'rgba(59,130,246,0.08)' : 'rgba(239,68,68,0.08)';
+    } else {
+      card.style.borderColor = 'rgba(248,250,255,0.08)';
+      card.style.background = 'var(--navy)';
+    }
+  });
+  // Badge
+  const badge = document.getElementById('active-player-badge');
+  if(who==='messi'){
+    badge.textContent = '🇦🇷 Jugando con Messi';
+    badge.style.background='rgba(59,130,246,0.15)';
+    badge.style.color='#93C5FD';
+  } else {
+    badge.textContent = '🇵🇹 Jugando con CR7';
+    badge.style.background='rgba(239,68,68,0.15)';
+    badge.style.color='#FCA5A5';
+  }
+  // Show labels
+  document.getElementById('messi-label').style.display='block';
+  document.getElementById('cr7-label').style.display='block';
+  startRound();
+}
+
+/* ─── Confetti ───────────────────────────────────────────────── */
+function spawnConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML='';
+  const colors=['#FCD34D','#34D399','#93C5FD','#F87171','#FCA5A5','#A5F3FC'];
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');
+    const size=Math.random()*5+4;
+    const x=Math.random()*100;
+    const delay=Math.random()*0.4;
+    const dur=0.8+Math.random()*0.6;
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    const rot=Math.random()*360;
+    p.style.cssText=`position:absolute;width:${size}px;height:${size}px;background:${color};border-radius:${Math.random()>0.5?'50%':'2px'};left:${x}%;top:-8px;transform:rotate(${rot}deg);animation:confettiFall ${dur}s ${delay}s ease-in both;`;
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>wrap.innerHTML='',2000);
+}
+
+/* ─── Reset / idle positions ─────────────────────────────────── */
+function resetPositions() {
+  clearInterval(animTimer);
+  // Messi: right side, facing left (center-right)
+  placeEl('messi-canvas', 0.62, 0.50);
+  // CR7: right side slightly more right
+  placeEl('cr7-canvas', 0.75, 0.50);
+  // Ball: near messi
+  placeBall(0.55, 0.52);
+  // Labels
+  updateLabels();
+  // Sprites
+  drawPlayerOn('messi-canvas','messi','idle');
+  drawPlayerOn('cr7-canvas','cr7','idle');
+  drawBall();
+  // Start idle wiggle
+  startIdleAnim();
+}
+
+function updateLabels() {
+  const f = getFieldEl();
+  if(!f) return;
+  const fw = f.offsetWidth, fh = f.offsetHeight;
+  const ml = document.getElementById('messi-label');
+  const cl = document.getElementById('cr7-label');
+  ml.style.left=(fw*0.62-18)+'px'; ml.style.top=(fh*0.50-46)+'px';
+  cl.style.left=(fw*0.75-12)+'px'; cl.style.top=(fh*0.50-46)+'px';
+}
+
+let idleT=0;
+function startIdleAnim() {
+  clearInterval(animTimer);
+  idleT=0;
+  animTimer=setInterval(()=>{
+    idleT++;
+    // Subtle idle bob for both
+    if(idleT%18===0) drawPlayerOn('messi-canvas','messi', idleT%36===0?'run1':'idle');
+    if(idleT%22===0) drawPlayerOn('cr7-canvas','cr7', idleT%44===0?'run1':'idle');
+  },80);
+}
+
+/* ─── Kick animation ─────────────────────────────────────────── */
+function animateGoal(who, onDone) {
+  clearInterval(animTimer);
+  const playerCanvasId = who+'-canvas';
+  const f = getFieldEl();
+  const fw = f.offsetWidth, fh = f.offsetHeight;
+
+  // Step 1: both run toward ball
+  let runF=0;
+  animTimer=setInterval(()=>{
+    runF++;
+    drawPlayerOn(playerCanvasId, who, runF%2===0?'run1':'run2');
+    drawPlayerOn(who==='messi'?'cr7-canvas':'messi-canvas', who==='messi'?'cr7':'messi', runF%3===0?'run1':'idle');
+  },100);
+
+  // Active player runs to ball
+  movePlayer(playerCanvasId, 0.52, 0.50, 360, ()=>{
+    clearInterval(animTimer);
+    // Step 2: KICK sprite
+    drawPlayerOn(playerCanvasId, who, 'kick');
+    // Step 3: ball flies to goal (left side)
+    setTimeout(()=>{
+      moveBall(0.03, 0.50, 500, ()=>{
+        // GOAL!
+        const flash = document.getElementById('goal-flash');
+        flash.style.background = 'radial-gradient(ellipse at 5% 50%,rgba(52,211,153,0.55),transparent 60%)';
+        flash.style.opacity='1';
+        const gt = document.getElementById('goal-text');
+        if(who==='messi'){
+          gt.textContent='⭐ GOL DE MESSI ⭐';
+          gt.style.color='#93C5FD';
+          gt.style.textShadow='0 2px 20px rgba(147,197,253,0.8)';
+        } else {
+          gt.textContent='🔥 SIUUUU CR7! 🔥';
+          gt.style.color='#FCA5A5';
+          gt.style.textShadow='0 2px 20px rgba(252,165,165,0.8)';
+        }
+        gt.style.opacity='1';
+        gt.style.transform='translate(-50%,-50%) scale(1.05)';
+        spawnConfetti();
+        // celebrate pose
+        drawPlayerOn(playerCanvasId, who, 'celebrate');
+        // animate celebrate — bounce
+        let ct=0;
+        animTimer=setInterval(()=>{
+          ct++;
+          const y = 0.50 + Math.sin(ct*0.7)*0.06;
+          placeEl(playerCanvasId, 0.52, y);
+          if(ct>20) drawPlayerOn(playerCanvasId,who,'celebrate');
+        },80);
+        setTimeout(()=>{
+          flash.style.opacity='0';
+          gt.style.opacity='0';
+          gt.style.transform='translate(-50%,-50%) scale(1)';
+        },2200);
+        setTimeout(()=>{ clearInterval(animTimer); resetPositions(); if(onDone)onDone(); },2800);
+      });
+    },150);
+  });
+}
+
+function animateMiss(who, onDone) {
+  clearInterval(animTimer);
+  const playerCanvasId = who+'-canvas';
+  let runF=0;
+  animTimer=setInterval(()=>{
+    runF++;
+    drawPlayerOn(playerCanvasId, who, runF%2===0?'run1':'run2');
+  },100);
+  movePlayer(playerCanvasId, 0.52, 0.50, 300, ()=>{
+    clearInterval(animTimer);
+    drawPlayerOn(playerCanvasId, who, 'kick');
+    setTimeout(()=>{
+      // ball goes wide — up and to the left but misses
+      moveBall(0.08, 0.12, 500, ()=>{
+        const gt = document.getElementById('goal-text');
+        gt.textContent = '😬 ¡Fallado!';
+        gt.style.color='#F87171';
+        gt.style.textShadow='0 2px 16px rgba(248,113,113,0.6)';
+        gt.style.opacity='1';
+        gt.style.transform='translate(-50%,-50%) scale(1)';
+        drawPlayerOn(playerCanvasId, who, 'sad');
+        setTimeout(()=>{
+          gt.style.opacity='0';
+        },1600);
+        setTimeout(()=>{
+          gt.style.color='#FCD34D';
+          gt.style.textShadow='0 2px 20px rgba(252,211,77,0.8)';
+          resetPositions();
+          if(onDone) onDone();
+        },2200);
+      });
+    },100);
+  });
+}
+
+/* ─── Goal display ───────────────────────────────────────────── */
+function updateGoalDisplay() {
+  const el = document.getElementById('goal-display');
+  el.innerHTML='';
+  for(let i=0;i<goals;i++){
+    const s=document.createElement('span');
+    s.textContent='⚽';
+    s.style.cssText='font-size:1rem;animation:goalPop 0.4s ease both;animation-delay:'+(i*0.05)+'s;opacity:0;';
+    el.appendChild(s);
+    setTimeout(()=>s.style.opacity='1', i*50);
+  }
+  for(let i=goals;i<10;i++){
+    const e=document.createElement('span');
+    e.style.cssText='display:inline-block;width:16px;height:16px;border-radius:50%;background:rgba(248,250,255,0.05);border:1px solid rgba(248,250,255,0.08);vertical-align:middle;margin:0 2px';
+    el.appendChild(e);
+  }
+}
+
+/* ─── Quiz ───────────────────────────────────────────────────── */
+const ALL_QUESTIONS = [
+  {cat:"Introducción a Power BI",q:"¿Cuál componente de Power BI se instala en tu computadora para crear reportes?",opts:["Power BI Service","Power BI Desktop","Power BI Mobile","Power BI Gateway"],ans:1},
+  {cat:"Introducción a Power BI",q:"¿Qué es un Semantic Model en Power BI?",opts:["Un archivo Excel conectado","Una visualización interactiva","Un modelo de datos publicado y reutilizable","Una conexión a SQL Server"],ans:2},
+  {cat:"Introducción a Power BI",q:"¿Cuál es la función principal de Power BI Service?",opts:["Crear reportes desde cero","Transformar datos con Power Query","Publicar, compartir y colaborar en la nube","Instalar gateways de datos"],ans:2},
+  {cat:"Conexión de datos",q:"¿Qué significa ETL en el contexto de datos?",opts:["Export, Transfer, Load","Extract, Transform, Load","Edit, Test, Launch","Enter, Type, Link"],ans:1},
+  {cat:"Conexión de datos",q:"En Import Mode, ¿dónde se almacenan los datos?",opts:["En el servidor SQL original","En SharePoint","En la memoria del modelo de Power BI","En OneDrive en tiempo real"],ans:2},
+  {cat:"Conexión de datos",q:"¿Cuándo es preferible usar DirectQuery?",opts:["Cuando tienes pocos datos","Cuando necesitas datos en tiempo real sin importar","Cuando el archivo es Excel","Cuando usas Power BI Mobile"],ans:1},
+  {cat:"Conexión de datos",q:"¿Cuál conector usarías para traer una lista de SharePoint?",opts:["SharePoint Files","SharePoint Lists","OneDrive for Business","Excel Online"],ans:1},
+  {cat:"Power Query",q:"¿Qué herramienta de Power BI usas para limpiar y transformar datos?",opts:["Vista de datos","Power Query Editor","DAX Studio","Model View"],ans:1},
+  {cat:"Power Query",q:"¿Qué operación combina dos tablas por una clave común?",opts:["Append Query","Group By","Merge Query","Pivot Column"],ans:2},
+  {cat:"Power Query",q:"¿Para qué sirve 'Append Query'?",opts:["Unir tablas por columnas clave","Apilar filas de tablas con la misma estructura","Transponer filas y columnas","Filtrar valores nulos"],ans:1},
+  {cat:"Power Query",q:"¿En qué lenguaje están escritos los pasos de Power Query?",opts:["DAX","SQL","Lenguaje M","Python"],ans:2},
+  {cat:"Modelado de datos",q:"En un Star Schema, ¿qué tabla contiene los eventos o transacciones del negocio?",opts:["Dimension Table","Lookup Table","Fact Table","Bridge Table"],ans:2},
+  {cat:"Modelado de datos",q:"¿Por qué es importante tener una tabla de fechas dedicada?",opts:["Para que el reporte se vea ordenado","Para poder usar Time Intelligence en DAX","Porque Power BI lo exige","Para reducir el tamaño del archivo"],ans:1},
+  {cat:"Modelado de datos",q:"¿Cuál es la cardinalidad más recomendada entre Fact y Dimension Table?",opts:["M:M","1:1","M:1","1:0"],ans:2},
+  {cat:"DAX Básico",q:"¿Cuál es la diferencia entre columna calculada y medida en DAX?",opts:["Las columnas son más rápidas","Las medidas se calculan en contexto de filtro; columnas fila por fila","Las columnas no usan DAX","Las medidas solo funcionan con enteros"],ans:1},
+  {cat:"DAX Básico",q:"¿Qué función DAX evita el error de división entre cero?",opts:["DIVIDE()","QUOTIENT()","SUM()/COUNT()","SAFE_DIVIDE()"],ans:0},
+  {cat:"DAX Básico",q:"¿Para qué sirve DISTINCTCOUNT()?",opts:["Suma valores únicos","Cuenta el número de valores únicos","Calcula promedio sin duplicados","Filtra repetidos"],ans:1},
+  {cat:"DAX Básico",q:"¿Qué hace CALCULATE() en DAX?",opts:["Calcula la suma de una columna","Evalúa una expresión en un contexto de filtro modificado","Crea columnas calculadas automáticamente","Conecta Power BI con Excel"],ans:1},
+  {cat:"DAX Intermedio",q:"¿Qué función calcula el acumulado desde inicio del año?",opts:["SAMEPERIODLASTYEAR","DATEADD","TOTALYTD","PARALLELPERIOD"],ans:2},
+  {cat:"DAX Intermedio",q:"¿Qué hace SAMEPERIODLASTYEAR()?",opts:["Calcula el valor del mismo periodo del año anterior","Suma todos los valores del año pasado","Filtra solo datos de diciembre anterior","Resta el año actual del anterior"],ans:0},
+  {cat:"DAX Intermedio",q:"¿Cuál función DAX crea un ranking dinámico de productos?",opts:["TOPN()","RANKX()","RANK.EQ()","INDEX()"],ans:1},
+  {cat:"DAX Intermedio",q:"¿Qué hace ALL() dentro de CALCULATE()?",opts:["Aplica todos los filtros activos","Elimina los filtros del contexto especificado","Calcula todos los valores","Suma todas las columnas visibles"],ans:1},
+  {cat:"Visualizaciones",q:"¿Qué visual es más adecuado para mostrar una tendencia a lo largo del tiempo?",opts:["Gráfico de anillo","Gráfico de barras","Gráfico de líneas","Treemap"],ans:2},
+  {cat:"Visualizaciones",q:"¿Cuándo NO es recomendable usar un gráfico de pie?",opts:["Cuando tienes 2 categorías","Cuando quieres proporciones","Cuando tienes más de 5 categorías","Cuando los valores son porcentajes"],ans:2},
+  {cat:"Visualizaciones",q:"¿Qué visual muestra mejor una métrica única como el Total de Ventas?",opts:["Barras","Slicer","Tarjeta (Card)","Tabla"],ans:2},
+  {cat:"Storytelling con Datos",q:"¿Qué son los 'preattentive attributes' según Knaflic?",opts:["Filtros antes del dashboard","Elementos procesados por el cerebro antes de pensar conscientemente","Atributos DAX precalculados","Metadatos de la fuente"],ans:1},
+  {cat:"Storytelling con Datos",q:"¿Cuál es el principio de Knaflic sobre el color?",opts:["Usar el máximo de colores posibles","Usar solo colores corporativos","Usar color con propósito para enfocar la atención","Evitar el color completamente"],ans:2},
+  {cat:"Storytelling con Datos",q:"¿Qué es el 'Chart Junk'?",opts:["Un tipo de gráfico no soportado","Elementos decorativos que no agregan información","Datos incorrectos en un dashboard","Gráficos con demasiadas filas"],ans:1},
+  {cat:"Dashboards Ejecutivos",q:"¿Cuántas preguntas clave debería responder una página ejecutiva?",opts:["1 sola","2 a 3 máximo","Entre 8 y 10","Las que quepan"],ans:1},
+  {cat:"Publicación y gobierno",q:"¿Qué es Row Level Security (RLS)?",opts:["Cifrar el archivo .pbix","Restringir qué datos ve cada usuario según reglas","Un tipo de refresco automático","Un sistema de versiones"],ans:1},
+  {cat:"Publicación y gobierno",q:"¿Qué se necesita para que un reporte local se actualice automáticamente?",opts:["Licencia Premium","On-premises Data Gateway","Cuenta de SharePoint","DirectQuery activado"],ans:1},
+];
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+function startRound(){
+  if(!activePlayer){
+    document.getElementById('q-feedback').innerHTML='<span style="color:#FCD34D;">⬆ Elige un jugador primero</span>';
+    return;
+  }
+  roundScore=0; currentQ=0; answered=false;
+  roundQuestions=shuffle(ALL_QUESTIONS).slice(0,5);
+  document.getElementById('round-result').style.display='none';
+  document.getElementById('quiz-card').style.display='block';
+  document.getElementById('score-num').textContent='0';
+  resetPositions();
+  showQuestion();
+}
+
+function showQuestion(){
+  const q=roundQuestions[currentQ];
+  document.getElementById('q-counter').textContent=`${currentQ+1}/5`;
+  document.getElementById('q-category').textContent=q.cat;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('q-feedback').innerHTML='';
+  document.getElementById('next-btn-wrap').style.display='none';
+  answered=false;
+  for(let i=1;i<=5;i++){
+    const b=document.getElementById('prog-'+i);
+    if(i<currentQ+1) b.style.background='#34D399';
+    else if(i===currentQ+1) b.style.background='#3B82F6';
+    else b.style.background='rgba(248,250,255,0.1)';
+  }
+  const opts=document.getElementById('q-options');
+  opts.innerHTML='';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=opt;
+    btn.style.cssText='background:rgba(248,250,255,0.04);border:1px solid rgba(248,250,255,0.1);border-radius:10px;padding:0.75rem 1rem;font-family:var(--font-body);font-size:0.85rem;color:rgba(248,250,255,0.8);cursor:pointer;text-align:left;transition:all 0.15s;line-height:1.4;';
+    btn.addEventListener('mouseover',()=>{ if(!answered){btn.style.background='rgba(59,130,246,0.12)';btn.style.borderColor='rgba(59,130,246,0.3)';btn.style.color='#fff';}});
+    btn.addEventListener('mouseout',()=>{ if(!answered){btn.style.background='rgba(248,250,255,0.04)';btn.style.borderColor='rgba(248,250,255,0.1)';btn.style.color='rgba(248,250,255,0.8)';}});
+    btn.addEventListener('click',()=>answerQ(i,btn));
+    opts.appendChild(btn);
+  });
+}
+
+function answerQ(idx, btn){
+  if(answered) return;
+  answered=true;
+  const q=roundQuestions[currentQ];
+  const allBtns=document.querySelectorAll('#q-options button');
+  allBtns.forEach(b=>b.style.cursor='default');
+  document.getElementById('prog-'+(currentQ+1)).style.background=(idx===q.ans)?'#34D399':'#EF4444';
+
+  if(idx===q.ans){
+    roundScore++;
+    document.getElementById('score-num').textContent=roundScore;
+    btn.style.background='rgba(52,211,153,0.15)';btn.style.borderColor='#34D399';btn.style.color='#34D399';
+    document.getElementById('q-feedback').innerHTML='<span style="color:#34D399;font-size:1.1rem;">✓</span> <span style="color:#34D399;">¡Correcto!</span>';
+    const s=parseInt(document.getElementById('streak-num').textContent);
+    document.getElementById('streak-num').textContent=s+1;
+    setTimeout(()=>{
+      animateGoal(activePlayer, ()=>{
+        setTimeout(()=>document.getElementById('next-btn-wrap').style.display='block',200);
+      });
+    },200);
+  } else {
+    btn.style.background='rgba(239,68,68,0.12)';btn.style.borderColor='#EF4444';btn.style.color='#F87171';
+    allBtns[q.ans].style.background='rgba(52,211,153,0.1)';allBtns[q.ans].style.borderColor='#34D399';allBtns[q.ans].style.color='#34D399';
+    document.getElementById('q-feedback').innerHTML='<span style="color:#F87171;">✗</span> <span style="color:#F87171;">Incorrecto.</span> La respuesta correcta está en verde.';
+    document.getElementById('streak-num').textContent=0;
+    setTimeout(()=>{
+      animateMiss(activePlayer, ()=>{
+        setTimeout(()=>document.getElementById('next-btn-wrap').style.display='block',200);
+      });
+    },200);
+  }
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=5) endRound();
+  else showQuestion();
+}
+
+function endRound(){
+  const correct=roundScore;
+  document.getElementById('quiz-card').style.display='none';
+  const goleado=correct===5;
+  if(goleado){ goals++; updateGoalDisplay(); }
+
+  const RESULTS=[
+    {min:0,max:0,emoji:'😬',title:'¡A estudiar más!',sub:'0 de 5. Repasa los módulos e inténtalo de nuevo.',color:'#F87171'},
+    {min:1,max:2,emoji:'😅',title:'Vas por el camino...',sub:`${correct} de 5. Sigue practicando, vas avanzando.`,color:'#FCD34D'},
+    {min:3,max:3,emoji:'🙂',title:'¡Bien hecho!',sub:'3 de 5. Ya tienes buena base.',color:'#93C5FD'},
+    {min:4,max:4,emoji:'🔥',title:'¡Casi perfecto!',sub:'4 de 5. Muy cerca del gol.',color:'#FCD34D'},
+    {min:5,max:5,emoji:activePlayer==='messi'?'⭐🐐':'🔥💪',title:activePlayer==='messi'?'¡GOL de Messi! ¡La Pulga!':'¡SIUUUU! CR7 no falla!',sub:'5 de 5 correctas. ¡Ronda perfecta! ¡Gol anotado!',color:'#34D399'},
+  ];
+  const res=RESULTS.find(r=>correct>=r.min&&correct<=r.max);
+
+  document.getElementById('result-emoji').textContent=res.emoji;
+  document.getElementById('result-title').style.color=res.color;
+  document.getElementById('result-title').textContent=res.title;
+  document.getElementById('result-sub').textContent=res.sub;
+  document.getElementById('total-goals-display').textContent=goals>0?`⚽ Goles anotados: ${goals}`:'';
+  document.getElementById('round-result').style.display='block';
+  if(goleado){ spawnConfetti(); drawPlayerOn(activePlayer+'-canvas',activePlayer,'celebrate'); }
+  else { drawPlayerOn(activePlayer+'-canvas',activePlayer,correct>=3?'idle':'sad'); }
+}
+
+function resetAll(){
+  goals=0; updateGoalDisplay();
+  document.getElementById('score-num').textContent='0';
+  document.getElementById('streak-num').textContent='0';
+  document.getElementById('round-result').style.display='none';
+  document.getElementById('quiz-card').style.display='block';
+  if(activePlayer) startRound();
+}
+
+/* init */
+document.addEventListener('DOMContentLoaded',()=>{
+  updateGoalDisplay();
+  setTimeout(()=>{
+    drawPlayerOn('messi-preview','messi','idle');
+    drawPlayerOn('cr7-preview','cr7','idle');
+    drawBall();
+    resetPositions();
+  },120);
+});
+
+/* ─── Scroll reveal ────────────────────────────────────────────── */
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 60);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  els.forEach(el => obs.observe(el));
+}
+</script>
+</body>
+</html>
